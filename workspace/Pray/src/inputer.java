@@ -165,13 +165,13 @@ import javax.annotation.processing.FilerException;
 				        
 				    }
 				} while(s > 10 || s < 1) ;
-			 numOfIterations =s;
+			 numOfIterations =s+1;
 			 
 			 
  s = 10;
 			 
 			 do {
-				 System.out.print("Select number for min weight: -5 - 4\n");
+				 System.out.print("Select number for min  : -5 - 4\n");
 
 				    try {
 				     s = Integer.parseInt(br.readLine()); // reading in an integer
@@ -189,7 +189,7 @@ import javax.annotation.processing.FilerException;
  s = 10;
 			 
 			 do {
-				 System.out.print("Select number for max weight: -5 - 4\n");
+				 System.out.print("Select number for max weight: -4 - 5\n");
 
 				    try {
 				     s = Integer.parseInt(br.readLine()); // reading in an integer
@@ -224,7 +224,7 @@ import javax.annotation.processing.FilerException;
 				fileName = "1in_sine.txt";
 			} else if (function == 3)// 3 -tahn
 			{
-				fileName = "1in_tahn.txt";
+				fileName = "1in_tanh.txt";
 			} else if (function > 3)// 4 - xor
 			{
 				fileName = "";

@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 
 //for each line in the input file
@@ -26,20 +27,25 @@ public class top_Level {
 		Neuron_Maker[] BRAIN = new Neuron_Maker[INP.popSize];
 
 		// initialise population
-		for (int x = 0; x < BRAIN.length; x++) {
+		for (int x = 0; x < BRAIN.length; x++) 
+		{
+			
 			BRAIN[x] = new Neuron_Maker(INP.mutateMax, INP.mutateMin,activation_function);
 			BRAIN[x].initialise_network();
 		}
-		System.out.println("hi");
 
+		
+		
 		// for each iteration
 		for (int a = 0; a < INP.numOfIterations; a++) {
 			System.out.println("iteration:" + a);
 
 			// for each network, set the first node
 			for (int y = 0; y < BRAIN.length; y++) {
+				
 				// for each line in the text file
 				for (int x = 0; x < INP.fileLength; x++) {
+					
 					BRAIN[y].first.weight = INP.IOS[x][0];
 
 					// for each network - run network
@@ -47,27 +53,41 @@ public class top_Level {
 					BRAIN[y].run_network();
 
 					localMSEValues[x] = BRAIN[y].last.runningTotal;
-System.out.println("evolve");
+					
 					// evolve here
 					// BRAIN[best] dont touch
 					// mess the rest
 					// evolve or mutate the neurons
-					for (int j = 0; j < BRAIN.length; j++) {
+					for (int j = 0; j < BRAIN.length-1; j++) {
 
 						if (j != best) {
 							// do the damn crossover
-							Neuron spacer = null;
 							if (INP.crossRate > 0) {
+							Neuron spacer = null;
+							
+							if(INP.popSize>1)
+							
+								
 								for (int k = 0; k < INP.crossRate; k++) {
+									
 									// move neuron crossRate times
-									spacer = BRAIN[j].c1;
-									BRAIN[j].c1 = BRAIN[j].c2;
-									BRAIN[j].c2 = BRAIN[j].c3;
-									BRAIN[j].c3 = BRAIN[j].c4;
-									BRAIN[j].c4 = BRAIN[j].c5;
-									BRAIN[j].c5 = spacer;
+									
+									Neuron spacer1 = BRAIN[j].c1;
+									Neuron spacer2 = BRAIN[j].c2;
+									Neuron spacer3 = BRAIN[j].c3;
+								
+									
+									BRAIN[j].c1 = BRAIN[j+1].c1;
+									BRAIN[j].c2 = BRAIN[j+1].c2;
+									BRAIN[j].c3 = BRAIN[j+1].c3;
+									
+									BRAIN[j+1].c1 = spacer1;
+									BRAIN[j+1].c2 = spacer2;
+									BRAIN[j+1].c3 = spacer3;
+									
 								}
 							}
+						}
 
 							// do the mutation
 							if (INP.mutationRate > 0) {
@@ -75,24 +95,15 @@ System.out.println("evolve");
 								float randomValue = (float) (-0.2 + (0.5 + (-0.2))
 										* r.nextFloat());
 								for (int k = 0; k < INP.mutationRate; k++) {
-	/*							*/
-									BRAIN[j].c1.weight = (float) (BRAIN[j].c1.weight * randomValue);
-									BRAIN[j].c2.weight = (float) (BRAIN[j].c2.weight * randomValue);
-									BRAIN[j].c3.weight = (float) (BRAIN[j].c3.weight * randomValue);
-									BRAIN[j].c4.weight = (float) (BRAIN[j].c4.weight * randomValue);
-									BRAIN[j].c5.weight = (float) (BRAIN[j].c5.weight * randomValue);
+									
+									for(ArrayList<Neuron> nlist:BRAIN[j].allHLayers)
+//										each neuron in each layer
+										for(Neuron n:nlist)
+										{
+											 n.weight = n.weight * randomValue;
+										}
 
-									/*System.out.println("weights after c1:"
-											+ BRAIN[j].c1.weight);
-									System.out.println("weights after c2:"
-											+ BRAIN[j].c2.weight);
-									System.out.println("weights after c3:"
-											+ BRAIN[j].c3.weight);
-									System.out.println("weights after c4:"
-											+ BRAIN[j].c4.weight);
-									System.out.println("weights after c5:"
-											+ BRAIN[j].c5.weight);
-*/
+
 								}
 
 							}
@@ -143,7 +154,7 @@ System.out.println("evolve");
 
 				// find best one
 
-				System.out.println("evolution starting now");
+
 				
 
 				float minValue = globalMSE[0];
@@ -159,12 +170,128 @@ System.out.println("evolve");
 				}
 				best = a1;
 
-				System.out.println("best" + best + " " + minValue);
+				System.out.println("Smallest MSE"+ best);
 				// ----------------------------------------------------------------------
 
+			System.out.println("print structure");
+			System.out.println("first node");
+			for(ArrayList<Neuron> ar:BRAIN[(int) best].allHLayers)
+			{
+				System.out.println("Nodes in this layer" + ar.size());
 			}
+			System.out.println("Last node");
+			
+			
+			//EVOlVE STRUCTURE HERE
+/*			step 1 find best in brain to leave alone
+ 
+			step 2 mutate the other networks
+			populate
+			
+			step 3 ???
+			step 4 profit
+			
+			
+			case 1 
+			add node to layer
+			
+			case 2
+			add a new layer with 1 node
+				only doable if greater than 1 node in layer
+				
+			case 3 
+			delete a node
+				only doable if greater than 1 node in layer
+			
+			*/
+			
+			//step 1
+			for(int aa = 0; aa<BRAIN.length;aa++ )
+			{
+				if(aa != (int)best)
+				
+				{
+					Random randomGenerator = new Random();
+					int randomInt = randomGenerator.nextInt(3);
+
+					//					insert case statement
+					if(randomInt == 0)
+					{
+//						add a node
+						//create neuron 
+						Neuron cN = new Neuron((randomGenerator.nextFloat() * INP.mutateMax) + INP.mutateMin ,INP.actFun);
+						
+					
+						//connect neuron with all noeds in previous layer
+						
+						ArrayList<Neuron> holderLevelMOne = null ;
+						
+						if(BRAIN[aa].allHLayers.size() != 1){
+							//the layer before the curretn layer
+							 holderLevelMOne = BRAIN[aa].allHLayers.get(BRAIN[aa].allHLayers.size()-1);
+						}
+							
+						
+						//connect for if 1-5-1
+						if(BRAIN[aa].allHLayers.size() == 1)
+						{
+							cN.connect(BRAIN[aa].first);
+							BRAIN[aa].last.connect(cN);
+						}
+//						connect for multilayer
+						else
+						{
+//							connect new node with each node from previous layer
+							for(Neuron object:holderLevelMOne)
+							{
+								cN.connect(object);
+							}
+							BRAIN[aa].last.connect(cN);
+						}
+							@SuppressWarnings("unused")
+							int size = BRAIN[aa].allHLayers.size();
+						//add to last layer
+										
+								(BRAIN[aa].allHLayers.get(BRAIN[aa].allHLayers.size()-1)).add(cN);
+						System.out.println("added new node");
+						
+					}
+					else if(randomInt ==1)
+					{
+//						add a level with a new node
+						Neuron cN = new Neuron((randomGenerator.nextFloat() * INP.mutateMax) + INP.mutateMin ,INP.actFun);
+						
+						//create new layer for neuron
+						ArrayList<Neuron> newLevel = new ArrayList<Neuron>();
+						
+//						get last layer of network
+						ArrayList<Neuron> temp = (BRAIN[aa].allHLayers.get(BRAIN[aa].allHLayers.size()-1));
+						
+//						connect last row to new neuron
+						for(Neuron n:temp)
+						{
+							cN.connect(n);
+						}
+						
+						BRAIN[aa].last.inputs.clear();
+						BRAIN[aa].last.connect(cN);
+						
+						System.out.println("added new layer");
+						
+					}
+					
+//					
+				}
+			}
+			
+			}	
+			
+			
+			
+			
+			
 		}
 
 	}
 
-}
+
